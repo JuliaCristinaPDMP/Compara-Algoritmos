@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void mergeSort(int start, int middle, int end, int array[]) {
+    int leftIdx, rightIdx, tempIdx, *tempArray;
+
+    tempArray = (int*)malloc(sizeof(int) * (end - start));
+
+    leftIdx = start;
+    rightIdx = middle;
+    tempIdx = 0;
+
+    while (leftIdx < middle && rightIdx < end) {
+        if (array[leftIdx] < array[rightIdx]) {
+            tempArray[tempIdx++] = array[leftIdx++];
+        } else {
+            tempArray[tempIdx++] = array[rightIdx++];
+        }
+    }
+
+    while (leftIdx < middle) {
+        tempArray[tempIdx++] = array[leftIdx++];
+    }
+
+    while (rightIdx < end) {
+        tempArray[tempIdx++] = array[rightIdx++];
+    }
+
+    for (leftIdx = start; leftIdx < end; leftIdx++) {
+        array[leftIdx] = tempArray[leftIdx - start];
+    }
+
+    free(tempArray);
+}
+
+void recursiveMergeSort(int start, int end, int array[]) {
+    if (start < end - 1) {
+        int middle = (start + end) / 2;
+
+        recursiveMergeSort(start, middle, array);
+        recursiveMergeSort(middle, end, array);
+        mergeSort(start, middle, end, array);
+    }
+}
+
+int main() {
+    const int baseSize = 50000;
+    int scaleIdx, execIdx, elemIdx, numExecutions = 3, scaleFactor = 8;
+    int array[baseSize * scaleFactor];
+    clock_t startTime, endTime;
+    double execTime = 0, avgTime = 0;
+
+    srand(time(NULL));
+
+    for (scaleIdx = 1; scaleIdx <= scaleFactor; scaleIdx++) {
+        printf("Array size: %d\n\n", (baseSize * scaleIdx));
+
+        for (execIdx = 0; execIdx < numExecutions; execIdx++) {
+            for (elemIdx = 0; elemIdx < (baseSize * scaleIdx); elemIdx++) {
+                array[elemIdx] = rand() % 101;
+            }
+
+            startTime = clock();
+
+            recursiveMergeSort(0, (baseSize * scaleIdx), array);
+
+            endTime = clock();
+
+            execTime = (double)(endTime - startTime) / CLOCKS_PER_SEC;
+            avgTime += execTime;
+
+            printf("Execution time %d: %f\n\n", execIdx + 1, execTime);
+        }
+
+        avgTime /= numExecutions;
+
+        printf("Average time: %f\n\n", avgTime);
+    }
+}
