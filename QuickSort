@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int quickSort(int inicioVetor, int fimVetor, int vetorValores[]) {
+    int valorPivo, indicePivo, indiceAtual, valorTemporario;
+
+    valorPivo = vetorValores[fimVetor];
+    indicePivo = inicioVetor;
+
+    for (indiceAtual = inicioVetor; indiceAtual < fimVetor; indiceAtual++) {
+        if (vetorValores[indiceAtual] <= valorPivo) {
+            valorTemporario = vetorValores[indicePivo];
+            vetorValores[indicePivo] = vetorValores[indiceAtual];
+            vetorValores[indiceAtual] = valorTemporario;
+
+            indicePivo++;
+        }
+    }
+
+    vetorValores[fimVetor] = vetorValores[indicePivo];
+    vetorValores[indicePivo] = valorPivo;
+
+    return indicePivo;
+}
+
+void quickSort(int inicio, int fim, int vetor[]) {
+    int meio;
+
+    if (inicio < fim) {
+        meio = quickSort(inicio, fim, vetor);
+
+        quickSort(inicio, meio - 1, vetor);
+        quickSort(meio + 1, fim, vetor);
+    }
+}
+
+int main() {
+    const int tamanhoBase = 20000;
+    int indiceTeste, indiceExecucao, indiceElemento, totalExecucoes = 3, totalTestes = 20;
+    int vetorPrincipal[tamanhoBase * totalTestes];
+    clock_t tempoInicio, tempoFim;
+    double tempoExecucao = 0, tempoMedio = 0;
+
+    srand(time(NULL));
+
+    for (indiceTeste = 1; indiceTeste <= totalTestes; indiceTeste++) {
+        printf("Tamanho do vetor: %d\n\n", (tamanhoBase * indiceTeste));
+        tempoMedio = 0;
+
+        for (indiceExecucao = 0; indiceExecucao < totalExecucoes; indiceExecucao++) {
+            for (indiceElemento = 0; indiceElemento < (tamanhoBase * indiceTeste); indiceElemento++) {
+                vetorPrincipal[indiceElemento] = rand() % 101;
+            }
+
+            tempoInicio = clock();
+
+            quickSort(0, (tamanhoBase * indiceTeste), vetorPrincipal);
+
+            tempoFim = clock();
+
+            tempoExecucao = (double)(tempoFim - tempoInicio) / CLOCKS_PER_SEC;
+            tempoMedio += tempoExecucao;
+
+            printf("Tempo execucao %d: %f\n", indiceExecucao + 1, tempoExecucao);
+        }
+
+        tempoMedio /= totalExecucoes;
+
+        printf("\nTempo medio: %f\n\n", tempoMedio);
+    }
+}
